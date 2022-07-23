@@ -1,5 +1,6 @@
 import 'package:bookaneer/widgets/book_item.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import '../../types/Book.dart';
 
 class BooksList extends StatefulWidget {
@@ -11,32 +12,30 @@ class BooksList extends StatefulWidget {
 }
 
 class BooksListState extends State<BooksList> {
-  final List<Book> books = [
-    Book(title: 'Платон - Государство', isBought: true),
-    Book(title: 'Дж.Оруэлл - 1984', isBought: false),
-    Book(title: 'А.Энгельгардт - Письма из деревни', isBought: true),
-    Book(title: 'Р.Мартин - Чистая архитектура', isBought: false),
-    Book(title: 'И.Ефремов - Таис Афинская', isBought: true)
-  ];
-
   void buyBook(String id) {
-    Book relatedBook = books.firstWhere((book) => book.id == id);
+    // Book relatedBook = books.firstWhere((book) => book.id == id);
 
-    setState(() {
-      relatedBook.isBought = true;
-    });
+    // setState(() {
+    //   relatedBook.isBought = true;
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(15),
-      child: ListView.separated(
-        itemCount: books.length,
-        itemBuilder: (BuildContext context, int index) {
-          return BookItem(data: books[index], callback: buyBook,);
+      child: ValueListenableBuilder(
+        valueListenable: Hive.box('books').listenable(),
+        builder: (BuildContext context, Box box, widget) {
+          return ListView.separated(
+            itemCount: box.length,
+            itemBuilder: (BuildContext context, int index) {
+              Book book = box.getAt(index);
+              return BookItem(data: book, callback: buyBook,);
+            },
+            separatorBuilder: (BuildContext context, int index) => const Divider()
+          );
         },
-        separatorBuilder: (BuildContext context, int index) => const Divider()
       ),
     );
   }

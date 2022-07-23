@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
 
+  final _key = GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: _key,
       title: 'Bookaneer',
       home: Scaffold(
         appBar: AppBar(title: const Text('Bookaneer!'),),
@@ -16,10 +19,21 @@ class App extends StatelessWidget {
         bottomNavigationBar: const BottomBar(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            showModalBottomSheet<void>(
-              context: context,
-              builder: (BuildContext context) => const BookForm()
-            );
+            void callback() {
+              _key.currentState?.showSnackBar(
+                const SnackBar(
+                  content: Text('Книга добавлена в вишлист!'),
+                  duration: Duration(milliseconds: 3000),
+                )
+              );
+            }
+
+            showDialog(context: context, builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Добавление книги'),
+                content: BookForm(callback: callback),
+              );
+            });
           },
           child: const Icon(Icons.add),
         ),
