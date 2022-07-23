@@ -1,0 +1,5 @@
+class BooksListModel {
+  addBook() {
+    
+  }
+}
